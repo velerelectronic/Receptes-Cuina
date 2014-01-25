@@ -1,16 +1,22 @@
 import QtQuick 2.0
 
 Rectangle {
-    width: 360
-    height: 360
+    id: mainApp
+// No dimensions. The rectangle must be full screen
+
     Text {
-        text: qsTr("Hello World")
-        anchors.centerIn: parent
+        id: title
+        text: "Receptes de cuina"
+        anchors.top: parent.top
+        anchors.horizontalCenter: parent.horizontalCenter
+
+        color: "#000000"
+        font.italic: false
+        font.bold: true
+        font.pointSize: 32
+        verticalAlignment: Text.AlignVCenter
+        font.family: "Tahoma"
     }
-    MouseArea {
-        anchors.fill: parent
-        onClicked: {
-            Qt.quit();
-        }
-    }
+
+
 }
