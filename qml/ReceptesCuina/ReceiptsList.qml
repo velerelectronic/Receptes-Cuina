@@ -68,7 +68,7 @@ Rectangle {
         model: receiptsModel
         delegate: Rectangle {
             width: parent.width
-//            height: 50
+            height: rowReceipt.height
             clip: true
             gradient: Gradient {
                 GradientStop { position: 0.9; color: "white" }
@@ -76,19 +76,26 @@ Rectangle {
             }
 
             Row {
+                id: rowReceipt
                 anchors.margins: 10
-                anchors.left: parent.left
-                anchors.right: parent.right
-                height: name.height + desc.height
+                height: childrenRect.height + 10
+                // height: 100
                 Column {
                     Text {
-                        text: name
+                        id: nameReceipt
+                        text: name + ' '
                         font.bold: true
                         font.pointSize: 18
+                        wrapMode: Text.NoWrap
+                        clip: true
                     }
                     Text {
-                        text: desc
+                        width: parent.width
+                        text: desc.replace(/[\n\r]/g,' ') + ' '
                         font.pointSize: 12
+                        wrapMode: Text.Wrap
+                        height: nameReceipt.height
+                        clip: true
                     }
                 }
             }
