@@ -1,8 +1,8 @@
 .import QtQuick.LocalStorage 2.0 as Sql
 
 function getDatabase() {
-    var db = Sql.LocalStorage.openDatabaseSync('receptesCuina_',"1.0",'Receptes de cuina',100 * 1024);
-    db.setVersion
+//    var db = Sql.LocalStorage.openDatabaseSync('ReceptesCuina',"1.0",'ReceptesCuina',100 * 1024);
+    var db = Sql.LocalStorage.openDatabaseSync('ReceptesCuina',"1.0",'ReceptesCuina',1000 * 1024);
     return db;
 }
 
@@ -58,9 +58,10 @@ function listIngredientsFromReceipt (idreceipt,model) {
         function(tx) {
             var rs = tx.executeSql('SELECT * FROM ingredientsReceipts WHERE receipt=? ORDER BY ord',[idreceipt]);
             for (var i=0; i<rs.rows.length; i++) {
-                model.append({id: rows.item(i).id,desc: rows.item(i).desc,type:'show'});
+                model.append({id: rows.item(i).id, desc: rows.item(i).desc, type:'show'});
             }
         });
+    model.append({id: 0,desc: 'Insereix un ingredient', type: 'create'});
     return model;
 }
 
@@ -69,9 +70,10 @@ function listStepsFromReceipt (idreceipt,model) {
         function(tx) {
             var rs = tx.executeSql('SELECT * FROM stepsReceipts WHERE receipt=? ORDER BY ord',[idreceipt]);
             for (var i=0; i<rs.rows.length; i++) {
-                model.append({id: rows.item(i).id,desc: rows.item(i).desc});
+                model.append({id: rows.item(i).id,desc: rows.item(i).desc, ord: rows.item(i).ord, type: 'show'});
             }
         });
+    model.append({id: 0,desc: 'Insereix una passa', ord: 0, type: 'create'});
 }
 
 function getReceiptNameAndDesc (idReceipt) {
@@ -86,11 +88,24 @@ function getReceiptNameAndDesc (idReceipt) {
     return data;
 }
 
-// New receipts
+// New elements
 
 function saveNewReceipt (name,desc) {
+    var idReceipt = 0;
     getDatabase().transaction(
         function(tx) {
             var rs = tx.executeSql('INSERT INTO receipts (name,desc) VALUES (?,?)',[name,desc]);
+            idReceipt = rs.rowId;
+        });
+    return idReceipt;
+}
+
+function saveNewIngredient(desc,receiptId) {
+    getDatabase().transaction(
+        function(tx) {
+            var ord;
+            var rs = tx.executeSql('SELECT max(ord) AS ord FROM ingredientsReceipts WHERE receipt=?');
+            ord = (rs.rows.length==0) ? 1 : rows.item(0).ord + 1;
+            rs = tx.executeSql('INSERT INTO ingredientsReceipts (receipt,ord,desc) VALUES (?,?,?)',[receiptId,ord,desc]);
         });
 }

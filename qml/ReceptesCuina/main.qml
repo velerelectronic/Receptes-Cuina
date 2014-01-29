@@ -42,8 +42,9 @@ Rectangle {
             }
             onNoNewReceipt: openMainPage()
             onSaveReceipt: {
-                Storage.saveNewReceipt(name,desc);
-                openMainPage()
+                var idReceipt = Storage.saveNewReceipt(name,desc)
+                pageLoader.setSource('ShowReceipt.qml')
+                pageLoader.item.fillReceipt(idReceipt)
             }
             onShowReceipt: {
                 pageLoader.setSource('ShowReceipt.qml')

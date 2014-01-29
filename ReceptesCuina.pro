@@ -1,3 +1,5 @@
+QT += sql
+
 # Add more folders to ship with the application, here
 folder_01.source = qml/ReceptesCuina
 folder_01.target = qml
@@ -18,6 +20,6 @@ qtcAddDeployment()
 
 OTHER_FILES += \
     qml/ReceptesCuina/ReceiptsList.qml \
-    qml/ReceptesCuina/Storage.js
+    qml/ReceptesCuina/Storage.js \
+    qml/ReceptesCuina/RLabel.qml
 
-QT += sql
