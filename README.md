@@ -50,3 +50,6 @@ Opcions que es poden realitzar:
 * Clicant o fent «tap» sobre ingredients o passes que ja hi ha a les llistes, també s'obre un diàleg incrustat per modificar-ne la descripció.
 * Fent un clic llarg «press and hold» sobre ingredients o passes, s'eliminen directament aquests elements, sense preguntar confirmació.
 
+Imatges
+-------
+* [Olla de cocció](http://pixabay.com/es/olla-de-cocci%C3%B3n-cook-ware-cocina-159470/) Llicència Public Domain CC0
