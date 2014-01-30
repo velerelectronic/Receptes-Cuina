@@ -8,14 +8,14 @@ import QtQuick.Controls 1.0
 Rectangle {
     id: elementBox
     property alias elementDesc: desc.text
-    property int elementId: 0
+    property int elementId: -1
     property string elementType: ''
     property int elementOrd: 0
-    property int elementIndex: 0
+    property int elementIndex: -1
 
     signal createElement
-    signal saveElement(string desc)
-    signal changeElement(int elementId,string desc)
+    signal saveElement(int elementId,string desc,int index)
+    signal changeElement(int elementId,string desc,int index)
     signal removeElement(int elementId,int index)
 
     anchors.left: parent.left
@@ -31,6 +31,7 @@ Rectangle {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.margins: 10
+        height: paintedHeight + 10
     }
 
     Text {
@@ -41,6 +42,8 @@ Rectangle {
         anchors.left: ord.right
         anchors.right: parent.right
         anchors.margins: 10
+        height: paintedHeight + 10
+        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
 
         MouseArea {
             id: area
@@ -51,7 +54,9 @@ Rectangle {
                     editBox.sourceComponent = newElement
 //                    area.enabled = false
                 } else {
-                    changeElement(elementId);
+                    changeElement(elementId,elementDesc,elementIndex);
+                    editBox.sourceComponent = newElement
+                    editBox.item.newDesc = elementDesc
                 }
             }
 
@@ -93,6 +98,7 @@ Rectangle {
 
         Rectangle {
             height: childrenRect.height
+            property alias newDesc: desc.text
 
             TextArea {
                 id: desc
@@ -100,7 +106,8 @@ Rectangle {
                 width: parent.width
                 height: 100
                 text: ''
-                wrapMode: TextEdit.WordWrap
+                focus: true
+                wrapMode: TextEdit.WrapAtWordBoundaryOrAnywhere
                 font.pointSize: 16
             }
 
@@ -112,19 +119,19 @@ Rectangle {
                 Button {
                     text: 'Desa'
                     onClicked: {
-                        elementBox.saveElement(desc.text)
+                        elementBox.saveElement(elementId,desc.text,elementIndex)
                         editBox.sourceComponent = blankObject
-                        area.enabled = true
                     }
                 }
                 Button {
                     text: 'Cancela'
                     onClicked: {
                         editBox.sourceComponent = blankObject
-                        area.enabled = true;
+//                        area.enabled = true;
                     }
                 }
             }
+            Component.onCompleted: desc.forceActiveFocus()
         }
     }
 }

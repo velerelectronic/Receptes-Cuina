@@ -76,13 +76,13 @@ Rectangle {
                     caption: qsTr('Ingredients')
                     model: ListModel { id: ingredientsModel }
                     delegate: ReceiptElement {
-                        elementId: id
-                        elementDesc: desc
-                        elementType: type
+                        elementId: model.id
+                        elementOrd: model.ord
+                        elementDesc: model.desc
+                        elementType: model.type
                         elementIndex: index
-                        onCreateElement: console.log('Create Ingredient')
                         onRemoveElement: Storage.removeIngredient(elementId,showReceipt.receiptId,ingredientsModel,elementIndex)
-                        onSaveElement: Storage.saveNewIngredient(desc,showReceipt.receiptId,ingredientsModel)
+                        onSaveElement: Storage.saveNewIngredient(elementId,desc,showReceipt.receiptId,ingredientsModel,elementIndex)
                     }
                     Component.onCompleted: Storage.listIngredientsFromReceipt(receiptId,ingredientsModel)
                 }
@@ -92,17 +92,17 @@ Rectangle {
                     caption: qsTr('Elaboració')
                     model: ListModel { id: stepsModel }
                     delegate: ReceiptElement {
-                        elementId: id
-                        elementOrd: ord
-                        elementDesc: desc
-                        elementType: type
+                        elementId: model.id
+                        elementOrd: model.ord
+                        elementDesc: model.desc
+                        elementType: model.type
                         elementIndex: index
-                        onCreateElement: console.log('Create Step')
                         onRemoveElement: Storage.removeStep(elementId,showReceipt.receiptId,stepsModel,elementIndex)
-                        onSaveElement: Storage.saveNewStep(desc,showReceipt.receiptId,stepsModel)
+                        onSaveElement: Storage.saveNewStep(elementId,desc,showReceipt.receiptId,stepsModel,elementIndex)
                     }
                     Component.onCompleted: Storage.listStepsFromReceipt(receiptId,stepsModel)
                 }
+
             }
         }
     }

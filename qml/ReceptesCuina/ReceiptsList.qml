@@ -105,7 +105,6 @@ Rectangle {
                     if (type=='create') {
                         receiptsWidget.newReceipt(receiptsWidget.searchString);
                     } else {
-                        console.log('Id ' + id);
                         receiptsWidget.showReceipt(id);
                     }
                 }
