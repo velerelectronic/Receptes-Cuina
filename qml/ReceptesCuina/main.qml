@@ -36,20 +36,10 @@ Rectangle {
         Connections {
             target: pageLoader.item
             ignoreUnknownSignals: true
-            onNewReceipt: {
-                pageLoader.setSource('NewReceipt.qml')
-                pageLoader.item.receiptName = name
-            }
+            onNewReceipt: pageLoader.setSource('NewReceipt.qml', {receiptName: name})
             onNoNewReceipt: openMainPage()
-            onSaveReceipt: {
-                var idReceipt = Storage.saveNewReceipt(name,desc)
-                pageLoader.setSource('ShowReceipt.qml')
-                pageLoader.item.fillReceipt(idReceipt)
-            }
-            onShowReceipt: {
-                pageLoader.setSource('ShowReceipt.qml')
-                pageLoader.item.fillReceipt(id)
-            }
+            onSavedReceipt: pageLoader.setSource('ShowReceipt.qml', {receiptId: receiptId})
+            onShowReceipt: pageLoader.setSource('ShowReceipt.qml', {receiptId: id})
             onCloseReceipt: openMainPage()
         }
     }

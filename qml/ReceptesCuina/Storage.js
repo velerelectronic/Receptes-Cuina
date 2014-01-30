@@ -1,7 +1,7 @@
 .import QtQuick.LocalStorage 2.0 as Sql
 
 function getDatabase() {
-//    var db = Sql.LocalStorage.openDatabaseSync('ReceptesCuina',"1.0",'ReceptesCuina',100 * 1024);
+    var db = Sql.LocalStorage.openDatabaseSync('ReceptesCuina',"1.0",'ReceptesCuina',100 * 1024);
     var db = Sql.LocalStorage.openDatabaseSync('ReceptesCuina',"1.0",'ReceptesCuina',1000 * 1024);
     return db;
 }
@@ -36,7 +36,7 @@ function listReceiptsWithFilter (model,filter) {
             if (filter=='') {
                 rs = tx.executeSql('SELECT * FROM receipts');
             } else {
-                rs = tx.executeSql('SELECT * FROM receipts WHERE instr(name,?)',[filter]);
+                rs = tx.executeSql('SELECT * FROM receipts WHERE instr(UPPER(name),UPPER(?))',[filter]);
             }
 
             model.clear();
@@ -58,10 +58,10 @@ function listIngredientsFromReceipt (idreceipt,model) {
         function(tx) {
             var rs = tx.executeSql('SELECT * FROM ingredientsReceipts WHERE receipt=? ORDER BY ord',[idreceipt]);
             for (var i=0; i<rs.rows.length; i++) {
-                model.append({id: rows.item(i).id, desc: rows.item(i).desc, type:'show'});
+                model.append({id: rs.rows.item(i).id, desc: rs.rows.item(i).desc, ord: rs.rows.item(i).ord, type:'show'});
             }
         });
-    model.append({id: 0,desc: 'Insereix un ingredient', type: 'create'});
+    model.append(newIngredientForModel());
     return model;
 }
 
@@ -70,7 +70,7 @@ function listStepsFromReceipt (idreceipt,model) {
         function(tx) {
             var rs = tx.executeSql('SELECT * FROM stepsReceipts WHERE receipt=? ORDER BY ord',[idreceipt]);
             for (var i=0; i<rs.rows.length; i++) {
-                model.append({id: rows.item(i).id,desc: rows.item(i).desc, ord: rows.item(i).ord, type: 'show'});
+                model.append({id: rs.rows.item(i).id,desc: rs.rows.item(i).desc, ord: rs.rows.item(i).ord, type: 'show'});
             }
         });
     model.append({id: 0,desc: 'Insereix una passa', ord: 0, type: 'create'});
@@ -100,12 +100,53 @@ function saveNewReceipt (name,desc) {
     return idReceipt;
 }
 
-function saveNewIngredient(desc,receiptId) {
+function newIngredientForModel() {
+    return {id: 0, desc: qsTr('Insereix un ingredient'), type: 'create'};
+}
+
+function newStepForModel() {
+    return {id: 0, desc: qsTr('Insereix una passa'), type: 'create'};
+}
+
+function saveNewIngredient(desc,receiptId,model) {
+    return saveNewElement('ingredientsReceipts',newIngredientForModel(),desc,receiptId,model);
+}
+
+function saveNewStep(desc,receiptId,model) {
+    return saveNewElement('stepsReceipts',newStepForModel(),desc,receiptId,model);
+}
+
+function saveNewElement(table,newElement,desc,receiptId,model) {
+    var idx;
     getDatabase().transaction(
         function(tx) {
             var ord;
-            var rs = tx.executeSql('SELECT max(ord) AS ord FROM ingredientsReceipts WHERE receipt=?');
-            ord = (rs.rows.length==0) ? 1 : rows.item(0).ord + 1;
-            rs = tx.executeSql('INSERT INTO ingredientsReceipts (receipt,ord,desc) VALUES (?,?,?)',[receiptId,ord,desc]);
+            var rs = tx.executeSql('SELECT max(ord) AS ord FROM ' + table + ' WHERE receipt=?',[receiptId]);
+            ord = (rs.rows.length==0) ? 1 : rs.rows.item(0).ord + 1;
+            rs = tx.executeSql('INSERT INTO ' + table + ' (receipt,ord,desc) VALUES (?,?,?)',[receiptId,ord,desc]);
+            idx = model.count-1;
+            model.set(idx,{id: rs.rowId, desc: desc, ord: ord, type:'show'});
+            model.append(newElement);
+        });
+    return idx;
+}
+
+// Remove elements
+function removeIngredient(ingredientId,receiptId,model,idx) {
+    console.log('Ingredient at '+idx);
+    removeElement('ingredientsReceipts',ingredientId,receiptId,model,idx);
+}
+
+function removeStep(stepId,receiptId,model,idx) {
+    console.log('Step at '+idx);
+    removeElement('stepsReceipts',stepId,receiptId,model,idx);
+}
+
+function removeElement(table,elementId,receiptId,model,idx) {
+    getDatabase().transaction(
+        function (tx) {
+            var rs = tx.executeSql('DELETE FROM ' + table + ' WHERE id=? AND receipt=?',[elementId,receiptId]);
+            // Errors should be checked
+            model.remove(idx);
         });
 }

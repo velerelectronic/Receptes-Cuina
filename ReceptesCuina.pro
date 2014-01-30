@@ -21,5 +21,5 @@ qtcAddDeployment()
 OTHER_FILES += \
     qml/ReceptesCuina/ReceiptsList.qml \
     qml/ReceptesCuina/Storage.js \
-    qml/ReceptesCuina/RLabel.qml
+    qml/ReceptesCuina/ReceiptElement.qml
 

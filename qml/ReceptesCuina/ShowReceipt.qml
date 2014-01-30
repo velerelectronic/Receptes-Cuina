@@ -17,7 +17,7 @@ Rectangle {
         anchors.top: parent.top
         anchors.bottom: boto.top
         contentWidth: width
-        contentHeight: childrenRect.height
+        contentHeight: contentItem.childrenRect.height
         interactive: true
         clip: true
 
@@ -31,96 +31,77 @@ Rectangle {
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.right: parent.right
-                height: childrenRect.height
+                spacing: 10
+//                height: childrenRect.height
 
                 Rectangle {
-                    id: nameRect
+                    id: dadesGenerals
+                    color: '#99ff99'
+                    border.color: 'green'
                     anchors.left: parent.left
                     anchors.right: parent.right
-                    anchors.margins: 10
-                    height: receiptName.height
+//                    anchors.top: parent.top
+                    anchors.margins: 20
+                    height: childrenRect.height + 20
 
-                    color: 'yellow'
                     Text {
                         id: receiptName
                         anchors.left: parent.left
                         anchors.right: parent.right
+                        anchors.top: parent.top
+                        anchors.margins: 10
                         wrapMode: Text.WordWrap
+                        font.pointSize: 20
+                        font.bold: true
                     }
-                }
 
-                Rectangle {
-                    id: descRect
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.margins: 10
-                    height: receiptDesc.height
-
-                    color: 'yellow';
                     Text {
                         id: receiptDesc
+                        anchors.top: receiptName.bottom
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.margins: 10
                         wrapMode: Text.WordWrap
+                        font.pointSize: 18
+                    }
+                    Component.onCompleted: {
+                        var dades = Storage.getReceiptNameAndDesc(receiptId);
+                        receiptName.text = dades.name;
+                        receiptDesc.text = dades.desc;
                     }
                 }
-                RLabel {
-                    id: labelIngredients
+
+                CommonList {
+                    id: ingr
                     caption: qsTr('Ingredients')
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                }
-
-
-
-                ListView {
-                    id: listIngredients
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    height: contentHeight
                     model: ListModel { id: ingredientsModel }
-                    interactive: false
-                    delegate: IngredientBox {
-                        ingredientId: id
-                        ingredientDesc: desc
-                        ingredientType: type
-                        onCreateIngredient: console.log('CreateIngredient');
-//                        onChangeIngredient: console.log('Change ingredient '+ingredientId)
-                        onSaveIngredient: Storage.saveNewIngredient(desc,showReceipt.receiptId);
+                    delegate: ReceiptElement {
+                        elementId: id
+                        elementDesc: desc
+                        elementType: type
+                        elementIndex: index
+                        onCreateElement: console.log('Create Ingredient')
+                        onRemoveElement: Storage.removeIngredient(elementId,showReceipt.receiptId,ingredientsModel,elementIndex)
+                        onSaveElement: Storage.saveNewIngredient(desc,showReceipt.receiptId,ingredientsModel)
                     }
-
                     Component.onCompleted: Storage.listIngredientsFromReceipt(receiptId,ingredientsModel)
                 }
 
-                RLabel {
+                CommonList {
+                    id: elab
                     caption: qsTr('Elaboració')
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                }
-
-                ListView {
-                    id: listSteps
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    height: contentHeight
-                    interactive: false
                     model: ListModel { id: stepsModel }
-
-                    delegate: Row {
-                        height: childrenRect.height
-                        Text {
-                            font.bold: true
-                            font.pointSize: 14
-                            color: "green"
-                            text: (type=='show')?ord:''
-                            // anchors.left: parent.left
-                        }
-                        Text {
-                            id: stepsDesc
-                            font.pointSize: 12
-                            text: desc
-                        }
+                    delegate: ReceiptElement {
+                        elementId: id
+                        elementOrd: ord
+                        elementDesc: desc
+                        elementType: type
+                        elementIndex: index
+                        onCreateElement: console.log('Create Step')
+                        onRemoveElement: Storage.removeStep(elementId,showReceipt.receiptId,stepsModel,elementIndex)
+                        onSaveElement: Storage.saveNewStep(desc,showReceipt.receiptId,stepsModel)
                     }
                     Component.onCompleted: Storage.listStepsFromReceipt(receiptId,stepsModel)
-
                 }
             }
         }
@@ -133,12 +114,7 @@ Rectangle {
         onClicked: showReceipt.closeReceipt()
     }
 
-    function fillReceipt(id) {
-        receiptId = id;
-        console.log('RI'+receiptId);
-        var dades = Storage.getReceiptNameAndDesc(receiptId);
-        receiptName.text = dades.name;
-        receiptDesc.text = dades.desc;
+    Component.onCompleted: {
     }
 
 }

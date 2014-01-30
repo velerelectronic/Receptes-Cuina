@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.0
+import "Storage.js" as Storage
 
 
 Rectangle {
@@ -7,8 +8,7 @@ Rectangle {
     anchors.fill: parent
 
     property alias receiptName: receiptName.text
-
-    signal saveReceipt(string name, string desc)
+    signal savedReceipt(int receiptId)
     signal noNewReceipt()
 
     Text {
@@ -58,7 +58,7 @@ Rectangle {
 
         anchors.margins: 10
         TextArea {
-            id: desc
+            id: receiptDesc
             anchors.fill: parent
             width: parent.width
             height: parent.height
@@ -74,13 +74,13 @@ Rectangle {
         anchors.margins: 10
         Button {
             text: 'Desa'
-            onClicked: newReceipt.saveReceipt(receiptName.text,desc.text)
             anchors.margins: 10
+            onClicked: newReceipt.savedReceipt(Storage.saveNewReceipt(receiptName.text,receiptDesc.text))
         }
         Button {
             text: 'Cancela'
-            onClicked: newReceipt.noNewReceipt()
             anchors.margins: 10
+            onClicked: newReceipt.noNewReceipt()
         }
     }
 
