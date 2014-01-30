@@ -1,4 +1,4 @@
-Receptes-Cuina
+Receptes de Cuina
 ==============
 
 Programa per gestionar un conjunt de receptes de cuina.
