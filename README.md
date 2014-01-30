@@ -48,5 +48,5 @@ Es mostren la llista d'ingredients i la llista de passes d'elaboració.
 Opcions que es poden realitzar:
 * Clicant o fent «tap» sobre el darrer element de les llistes d'ingredients o de passes d'elaboració, s'obren uns diàlegs incrustats per afegir nous ingredients o noves passes.
 * Clicant o fent «tap» sobre ingredients o passes que ja hi ha a les llistes, també s'obre un diàleg incrustat per modificar-ne la descripció.
-* Fent un clic llarg -«press and hold» sobre ingredients o passes, s'eliminen directament aquests elements, sense preguntar confirmació.
+* Fent un clic llarg «press and hold» sobre ingredients o passes, s'eliminen directament aquests elements, sense preguntar confirmació.
 
