@@ -34,6 +34,7 @@ Rectangle {
             focus: true
             anchors.fill: parent
             font.pointSize: 20
+            inputMethodHints: Qt.ImhNoPredictiveText
         }
         anchors.margins: 10
     }
@@ -65,6 +66,7 @@ Rectangle {
             text: ''
             wrapMode: TextEdit.WordWrap
             font.pointSize: 16
+            inputMethodHints: Qt.ImhNoPredictiveText
         }
     }
 

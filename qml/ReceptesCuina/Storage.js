@@ -159,3 +159,49 @@ function removeElement(table,elementId,receiptId,model,idx) {
             }
         });
 }
+
+
+// Export to other formats
+
+function exportDatabaseToText() {
+    var exportSql = '';
+    getDatabase().readTransaction(
+        function (tx) {
+            var rs = tx.executeSql("SELECT tbl_name FROM sqlite_master WHERE type='table'");
+            for (var i=0; i<rs.rows.length; i++) {
+                var tblname = rs.rows.item(i).tbl_name;
+                var rs2 = tx.executeSql('SELECT * FROM ' + tblname);
+                for (var j=0; j<rs2.rows.length; j++) {
+                    var row = rs2.rows.item(j);
+                    var fields = [];
+                    var values = [];
+                    for (var col in row) {
+                        fields.push(col);
+                        values.push('"' + row[col].toString().replace(/\"/g,'""') + '"');
+                    }
+                    exportSql += 'INSERT INTO ' + tblname + '(' + fields.join(',') + ') VALUES (' + values.join(',') +');\n';
+                }
+            }
+        });
+    return exportSql;
+}
+
+function importDatabaseFromText(text) {
+    var msgError = '';
+    getDatabase().transaction(
+        function (tx) {
+            var queries = text.split(/\r\n|\r|\n/g);
+            for (var i=0; i<queries.length; i++) {
+                if (queries[i] != '') {
+                    try {
+                        var rs = tx.executeSql(queries[i], []);
+                    }
+                    catch(error) {
+                        msgError += 'Ups! Error ha estat '+error+')\n';
+                    }
+                }
+            }
+        });
+    return msgError;
+}
+

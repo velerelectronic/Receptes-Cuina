@@ -109,6 +109,7 @@ Rectangle {
                 focus: true
                 wrapMode: TextEdit.WrapAtWordBoundaryOrAnywhere
                 font.pointSize: 16
+                inputMethodHints: Qt.ImhNoPredictiveText
             }
 
             Row {

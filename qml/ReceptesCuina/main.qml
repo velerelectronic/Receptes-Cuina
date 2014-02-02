@@ -11,6 +11,8 @@ Rectangle {
     signal noNewReceipt
     signal showReceipt (int id)
     signal closeReceipt
+    signal backup
+    signal closeBackup
 
     Text {
         id: title
@@ -41,6 +43,8 @@ Rectangle {
             onSavedReceipt: pageLoader.setSource('ShowReceipt.qml', {receiptId: receiptId})
             onShowReceipt: pageLoader.setSource('ShowReceipt.qml', {receiptId: id})
             onCloseReceipt: openMainPage()
+            onBackup: pageLoader.setSource('Backup.qml')
+            onCloseBackup: openMainPage()
         }
     }
 

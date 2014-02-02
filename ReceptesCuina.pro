@@ -21,5 +21,8 @@ qtcAddDeployment()
 OTHER_FILES += \
     qml/ReceptesCuina/ReceiptsList.qml \
     qml/ReceptesCuina/Storage.js \
-    qml/ReceptesCuina/ReceiptElement.qml
+    qml/ReceptesCuina/ReceiptElement.qml \
+    android/AndroidManifest.xml
+
+ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
 

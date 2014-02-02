@@ -5,6 +5,7 @@ Rectangle {
     id: receiptsWidget
     signal newReceipt (string name)
     signal showReceipt (int id)
+    signal backup
 
     property alias searchString: textCercador.text
 
@@ -53,6 +54,18 @@ Rectangle {
 
     }
 
+    Image {
+        id: mainImage
+        source: 'res/cooking-pot-159470_1280.png'
+        width: parent.height / 2
+        height: parent.height / 2
+        fillMode: Image.PreserveAspectFit
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.margins: parent.height / 8
+    }
+
     ListModel {
         id: receiptsModel
     }
@@ -64,21 +77,30 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: cercador.bottom
-        anchors.bottom: parent.bottom
+        anchors.bottom: backupArea.top
+        anchors.margins: 10
+
         model: receiptsModel
         delegate: Rectangle {
             width: parent.width
             height: rowReceipt.height
             clip: true
-            gradient: Gradient {
-                GradientStop { position: 0.9; color: "white" }
-                GradientStop { position: 1.0; color: "black" }
+
+            Rectangle {
+                anchors.fill: parent
+                opacity: 0.5
+
+                gradient: Gradient {
+                    GradientStop { position: 0.9; color: "white" }
+                    GradientStop { position: 1.0; color: "black" }
+                }
             }
 
             Row {
                 id: rowReceipt
                 anchors.margins: 10
                 height: childrenRect.height + 10
+                z: 2
                 // height: 100
                 Column {
                     Text {
@@ -88,6 +110,7 @@ Rectangle {
                         font.pointSize: 18
                         wrapMode: Text.NoWrap
                         clip: true
+                        opacity: 1
                     }
                     Text {
                         width: parent.width
@@ -96,6 +119,7 @@ Rectangle {
                         wrapMode: Text.Wrap
                         height: nameReceipt.height
                         clip: true
+                        opacity: 1
                     }
                 }
             }
@@ -109,6 +133,24 @@ Rectangle {
                     }
                 }
             }
+        }
+    }
+
+    Rectangle {
+        id: backupArea
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        height: 50
+
+        Text {
+            text: 'Backup'
+            anchors.centerIn: parent
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: receiptsWidget.backup()
         }
     }
 
