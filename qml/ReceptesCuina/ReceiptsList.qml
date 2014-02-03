@@ -32,7 +32,7 @@ Rectangle {
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
             text: ''
-            font.pixelSize: 16
+            font.pointSize: 18
             anchors.margins: parent.height / 4
             inputMethodHints: Qt.ImhNoPredictiveText
 

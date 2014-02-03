@@ -34,20 +34,34 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.top: exportLabel.bottom
-                anchors.bottom: exportButton.top
+                anchors.bottom: exportButtonsRow.top
                 focus: true
                 wrapMode: TextEdit.WrapAnywhere
                 readOnly: true
                 font.pointSize: 12
                 inputMethodHints: Qt.ImhNoPredictiveText
             }
-            Button {
-                id: exportButton
-                text: 'Exporta'
+            Row {
+                id: exportButtonsRow
+                anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
-                onClicked: exportContents.text = Storage.exportDatabaseToText()
+                height: childrenRect.height
+
+                Button {
+                    text: 'Exporta'
+                    onClicked: exportContents.text = Storage.exportDatabaseToText()
+                }
+
+                Button {
+                    text: 'Copia al clipboard'
+                    onClicked: {
+                        exportContents.selectAll()
+                        exportContents.copy()
+                    }
+                }
             }
+
         }
         Item {
             id: importArea
@@ -66,28 +80,39 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.top: importLabel.bottom
-                anchors.bottom: importButton.top
+                anchors.bottom: importButtonsRow.top
                 focus: true
                 wrapMode: TextEdit.WrapAnywhere
                 readOnly: false
                 font.pointSize: 12
                 inputMethodHints: Qt.ImhNoPredictiveText
             }
-            Button {
-                id: importButton
-                text: 'Importa'
+            Row {
+                id: importButtonsRow
+                anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
-                onClicked: {
-                    var error = Storage.importDatabaseFromText(importContents.text);
-                    if (error != '')
-                        importContents.text = 'Error '
-                    else {
-                        importContents.text = 'OK'
-                        text = 'Inserides!'
+                height: childrenRect.height
+
+                Button {
+                    text: 'Enganxa del clipboard'
+                    onClicked: importContents.paste()
+                }
+
+                Button {
+                    text: 'Importa'
+                    onClicked: {
+                        var error = Storage.importDatabaseFromText(importContents.text);
+                        if (error != '')
+                            importContents.text = 'Error '
+                        else {
+                            importContents.text = 'OK'
+                            text = 'Inserides!'
+                        }
                     }
                 }
             }
+
         }
 
     }
