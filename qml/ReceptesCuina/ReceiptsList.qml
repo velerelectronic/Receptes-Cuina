@@ -7,51 +7,13 @@ Rectangle {
     signal showReceipt (int id)
     signal backup
 
-    property alias searchString: textCercador.text
-
-    Rectangle {
-        id: cercador
-        border.color: "black"
+    SearchBox {
+        id: searchBox
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.margins: 10
-        height: 40
-        radius: height / 2
-
-        Timer {
-            id: waitTimer
-            interval: 500
-            running: false
-            onTriggered: cercador.updateList()
-        }
-
-        TextInput {
-            id: textCercador
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            text: ''
-            font.pointSize: 18
-            anchors.margins: parent.height / 4
-            inputMethodHints: Qt.ImhNoPredictiveText
-
-            onAccepted: {
-                waitTimer.stop()
-                cercador.updateList()
-                focus = false
-                focus = true
-            }
-
-            onTextChanged: {
-                waitTimer.restart()
-            }
-        }
-
-        function updateList() {
-            Storage.listReceiptsWithFilter(receiptsModel,textCercador.text);
-        }
-
+        onPerformSearch: Storage.listReceiptsWithFilter(receiptsModel,textSearch)
     }
 
     Image {
@@ -76,7 +38,7 @@ Rectangle {
 
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.top: cercador.bottom
+        anchors.top: searchBox.bottom
         anchors.bottom: backupArea.top
         anchors.margins: 10
 
@@ -105,7 +67,7 @@ Rectangle {
                 Column {
                     Text {
                         id: nameReceipt
-                        text: name + ' '
+                        text: (type=='show')? name + ' ' : desc
                         font.bold: true
                         font.pointSize: 18
                         wrapMode: Text.NoWrap
@@ -127,7 +89,7 @@ Rectangle {
                 anchors.fill: parent
                 onClicked: {
                     if (type=='create') {
-                        receiptsWidget.newReceipt(receiptsWidget.searchString);
+                        receiptsWidget.newReceipt(name);
                     } else {
                         receiptsWidget.showReceipt(id);
                     }

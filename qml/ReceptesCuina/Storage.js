@@ -44,9 +44,9 @@ function listReceiptsWithFilter (model,filter) {
             }
 
             if (filter=='') {
-                model.append({id: -1, name: qsTr('Afegeix una recepta'), desc: '', type:'create'});
+                model.append({id: -1, name: '', desc: qsTr('Afegeix una recepta'), type:'create'});
             } else {
-                model.append({id: -1, name: qsTr('Afegeix nova recepta'), desc: 'amb el nom «' + filter + '»',type:'create'});
+                model.append({id: -1, name: filter, desc: qsTr('Afegeix nova recepta amb el nom') + ' «' + filter + '»', type:'create'});
             }
         });
     return model;
