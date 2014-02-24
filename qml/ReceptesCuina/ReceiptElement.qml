@@ -1,5 +1,7 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.0
+import QtQuick.Layouts 1.1
+import 'core' as Core
 
 // Element that represents:
 // * a single ingredient
@@ -13,77 +15,92 @@ Rectangle {
     property int elementOrd: 0
     property int elementIndex: -1
 
-    signal createElement
-    signal saveElement(int elementId,string desc,int index)
-    signal changeElement(int elementId,string desc,int index)
-    signal removeElement(int elementId,int index)
+    signal createElementRequested
+    signal saveElementRequested(int elementId,string desc,int index)
+    signal changeElementRequested(int elementId,string desc,int index)
+    signal removeElementRequested(int elementId,int index)
 
     anchors.left: parent.left
     anchors.right: parent.right
     height: childrenRect.height
-    anchors.margins: 40
+    anchors.margins: units.fingerUnit
 
-    Text {
-        id: ord
-        text: (elementOrd==0 || type=='create') ? '' : elementOrd
-        font.pointSize: 14
-        font.bold: true
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.margins: 10
-        height: paintedHeight + 10
-    }
+    Core.BasicWidget { id: units }
 
-    Text {
-        id: desc
-        text: elementDesc
-        font.pointSize: 12
-        anchors.top: parent.top
-        anchors.left: ord.right
-        anchors.right: parent.right
-        anchors.margins: 10
-        height: paintedHeight + 10
-        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-
-        MouseArea {
-            id: area
-            anchors.fill: parent
-            onClicked: {
-                if (type=='create') {
-                    createElement();
-                    editBox.sourceComponent = newElement
-//                    area.enabled = false
-                } else {
-                    changeElement(elementId,elementDesc,elementIndex);
-                    editBox.sourceComponent = newElement
-                    editBox.item.newDesc = elementDesc
-                }
-            }
-
-            onPressAndHold: {
-                if (type=='show') {
-                    removeElement(elementId,elementIndex);
-                }
-            }
-
-        }
-/*
-        PinchArea {
-            id: pincharea
-            anchors.fill: parent
-            pinch.target: desc
-            onPinchStarted: console.log('Pinch')
-        }
-        */
-    }
-
-    Loader {
-        id: editBox
-        anchors.top: desc.bottom
+    RowLayout {
         anchors.left: parent.left
         anchors.right: parent.right
+        anchors.top: parent.top
         height: childrenRect.height
+
+        Text {
+            id: ord
+            text: (elementOrd==0 || type=='create') ? '' : elementOrd
+            font.pixelSize: units.fingerUnit
+            font.bold: true
+            anchors.margins: units.nailUnit
+            height: paintedHeight
+        }
+
+        Text {
+            id: desc
+            text: elementDesc
+            font.pixelSize: units.fingerUnit
+            Layout.fillWidth: true
+            anchors.margins: units.nailUnit
+            height: paintedHeight
+            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+
+            MouseArea {
+                id: area
+                anchors.fill: parent
+                onClicked: {
+                    if (type=='create') {
+                        createElementRequested(); // signaling
+                        editBox.sourceComponent = newElement
+                        editBox.visible = true
+                    } else {
+                        changeElementRequested(elementId,elementDesc,elementIndex); // signaling
+                        desc.visible = false
+                        editBox.sourceComponent = newElement
+                        editBox.item.newDesc = elementDesc
+                        editBox.visible = true
+                    }
+                }
+
+                onPressAndHold: {
+                    if (type=='show') {
+                        removeElementRequested(elementId,elementIndex);
+                    }
+                }
+
+            }
+    /*
+            PinchArea {
+                id: pincharea
+                anchors.fill: parent
+                pinch.target: desc
+                onPinchStarted: console.log('Pinch')
+            }
+            */
+        }
+
+        Loader {
+            id: editBox
+            Layout.fillWidth: true
+            height: childrenRect.height
+            Connections {
+                target: editBox.item
+                ignoreUnknownSignals: true
+                onCloseEditor: {
+                    editBox.visible = false;
+                    editBox.sourceComponent = blankObject;
+                    desc.visible = true
+                }
+            }
+        }
     }
+
 
     Component {
         id: blankObject
@@ -97,18 +114,21 @@ Rectangle {
         id: newElement
 
         Rectangle {
+            id: rectElement
             height: childrenRect.height
             property alias newDesc: desc.text
+            signal closeEditor
 
             TextArea {
                 id: desc
                 anchors.top: parent.top
-                width: parent.width
-                height: 100
+                anchors.left: parent.left
+                anchors.right: parent.right
+                height: units.fingerUnit * 2
                 text: ''
                 focus: true
                 wrapMode: TextEdit.WrapAtWordBoundaryOrAnywhere
-                font.pointSize: 16
+                font.pointSize: units.fingerUnit
                 inputMethodHints: Qt.ImhNoPredictiveText
             }
 
@@ -120,19 +140,19 @@ Rectangle {
                 Button {
                     text: 'Desa'
                     onClicked: {
-                        elementBox.saveElement(elementId,desc.text,elementIndex)
-                        editBox.sourceComponent = blankObject
+                        elementBox.saveElementRequested(elementId,desc.text,elementIndex)
+                        rectElement.closeEditor();
                     }
                 }
                 Button {
                     text: 'Cancela'
                     onClicked: {
-                        editBox.sourceComponent = blankObject
-//                        area.enabled = true;
+                        rectElement.closeEditor();
                     }
                 }
             }
+
             Component.onCompleted: desc.forceActiveFocus()
         }
-    }
+    }    
 }

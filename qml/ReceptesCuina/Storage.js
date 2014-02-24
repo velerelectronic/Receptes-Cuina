@@ -68,7 +68,7 @@ function listElementsFromReceipt(table,newElement,receiptId,model) {
                 model.append({id: rs.rows.item(i).id, desc: rs.rows.item(i).desc, ord: rs.rows.item(i).ord, type:'show'});
             }
         });
-    model.append(newElement);
+    // model.append(newElement);
 }
 
 function getReceiptNameAndDesc (idReceipt) {
@@ -122,8 +122,7 @@ function saveNewElement(table,newElement,elementId,desc,receiptId,model,elementI
                 rs = tx.executeSql('INSERT INTO ' + table + ' (receipt,ord,desc) VALUES (?,?,?)',[receiptId,ord,desc]);
                 var newId = parseInt(rs.insertId);
                 if (newId>0) {
-                    model.set(elementIndex,{id: newId, desc: desc, ord: ord, type: 'show'});
-                    model.append(newElement);
+                    model.append({id: newId, desc: desc, ord: ord, type: 'show'});
                 } else {
                     console.log('Element not inserted in table «' + table + '»');
                 }
@@ -161,40 +160,57 @@ function removeElement(table,elementId,receiptId,model,idx) {
 }
 
 
-// Export to other formats
+// Export to other formats amb import
 
 function exportDatabaseToText() {
-    var exportSql = '';
+    var exportObject = {};
+    exportObject.database = {}
+    exportObject.database.tables = [];
+
     getDatabase().readTransaction(
         function (tx) {
             var rs = tx.executeSql("SELECT tbl_name FROM sqlite_master WHERE type='table'");
             for (var i=0; i<rs.rows.length; i++) {
                 var tblname = rs.rows.item(i).tbl_name;
+
+                var objectTable = {}
+                objectTable.name = tblname;
+                objectTable.records = [];
+
                 var rs2 = tx.executeSql('SELECT * FROM ' + tblname);
                 for (var j=0; j<rs2.rows.length; j++) {
-                    var row = rs2.rows.item(j);
-                    var fields = [];
-                    var values = [];
-                    for (var col in row) {
-                        fields.push(col);
-                        values.push('"' + row[col].toString().replace(/\"/g,'""') + '"');
-                    }
-                    exportSql += 'INSERT INTO ' + tblname + '(' + fields.join(',') + ') VALUES (' + values.join(',') +');\n';
+                    objectTable.records.push(rs2.rows.item(j));
                 }
+                exportObject.database.tables.push(objectTable);
             }
         });
-    return exportSql;
+    return JSON.stringify(exportObject);
 }
 
 function importDatabaseFromText(text) {
+    var importObject = JSON.parse(text);
     var msgError = '';
     getDatabase().transaction(
         function (tx) {
-            var queries = text.split(/\r\n|\r|\n/g);
-            for (var i=0; i<queries.length; i++) {
-                if (queries[i] != '') {
+            // Iterate through the tables
+            for (var numTable=0; numTable<importObject.database.tables.length; numTable++) {
+                var table = importObject.database.tables[numTable];
+                // Iterate through the records of one table
+                var rs = tx.executeSql('DELETE FROM ' + table.name);
+                for (var numRecord=0; numRecord<table.records.length; numRecord++) {
+                    // Iterate through the fields and values of one record
+                    var fields = [];
+                    var unknowns = [];
+                    var values = [];
+                    for (var prop in table.records[numRecord]) {
+                        fields.push(prop);
+                        unknowns.push('?');
+                        values.push(table.records[numRecord][prop]);
+                    }
+                    var importSql = 'INSERT INTO ' + table.name + ' (' + fields.join(',') + ') VALUES (' + unknowns.join(',') +')';
                     try {
-                        var rs = tx.executeSql(queries[i], []);
+                        console.log(importSql + '--' + values.toString());
+                        var rs = tx.executeSql(importSql, values);
                     }
                     catch(error) {
                         msgError += 'Ups! Error ha estat '+error+')\n';

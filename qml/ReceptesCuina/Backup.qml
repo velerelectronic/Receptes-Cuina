@@ -1,128 +1,108 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.0
+import QtQuick.Layouts 1.1
+import 'core' as Core
 import "Storage.js" as Storage
 
-Rectangle {
+ColumnLayout {
     id: backup
     anchors.fill: parent
-    anchors.margins: 20
+    anchors.margins: units.nailUnit * 2
 
     signal closeBackup
 
-    Item {
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.bottom: backbutton.top
-        anchors.margins: 10
+    Core.BasicWidget {
+        id: units
+    }
 
-        Item {
-            id: exportArea
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.bottom: parent.verticalCenter
+    Rectangle {
+        Layout.fillHeight: true
+        Layout.fillWidth: true
+
+        anchors.margins: units.nailUnit
+        color: 'yellow'
+
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: units.nailUnit
             Text {
                 id: exportLabel
                 text: qsTr('Exporta')
-                anchors.top: parent.top
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.margins: 10
+                Layout.fillWidth: true
+                anchors.margins: units.nailUnit
             }
             TextArea {
                 id: exportContents
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: exportLabel.bottom
-                anchors.bottom: exportButtonsRow.top
+                Layout.fillWidth: true
+                Layout.fillHeight: true
                 focus: true
                 wrapMode: TextEdit.WrapAnywhere
                 readOnly: true
                 font.pointSize: 12
                 inputMethodHints: Qt.ImhNoPredictiveText
             }
-            Row {
+            RowLayout {
                 id: exportButtonsRow
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                height: childrenRect.height
+                height: units.fingerUnit
 
                 Button {
-                    text: 'Exporta'
+                    text: qsTr('Exporta a JSON')
                     onClicked: exportContents.text = Storage.exportDatabaseToText()
                 }
 
                 Button {
-                    text: 'Copia al clipboard'
+                    text: qsTr('Copia al clipboard')
                     onClicked: {
                         exportContents.selectAll()
                         exportContents.copy()
                     }
                 }
             }
-
-        }
-        Item {
-            id: importArea
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.top: parent.verticalCenter
-            anchors.bottom: parent.bottom
             Text {
                 id: importLabel
                 text: qsTr('Importa')
-                anchors.top: parent.top
-                anchors.horizontalCenter: parent.horizontalCenter
+                Layout.fillWidth: true
             }
             TextArea {
                 id: importContents
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: importLabel.bottom
-                anchors.bottom: importButtonsRow.top
+                Layout.fillWidth: true
+                Layout.fillHeight: true
                 focus: true
                 wrapMode: TextEdit.WrapAnywhere
                 readOnly: false
                 font.pointSize: 12
                 inputMethodHints: Qt.ImhNoPredictiveText
             }
-            Row {
+            RowLayout {
                 id: importButtonsRow
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                height: childrenRect.height
+                height: units.fingerUnit
 
                 Button {
-                    text: 'Enganxa del clipboard'
+                    text: qsTr('Enganxa del clipboard')
                     onClicked: importContents.paste()
                 }
 
                 Button {
-                    text: 'Importa'
+                    text: qsTr('Importa des de JSON')
                     onClicked: {
                         var error = Storage.importDatabaseFromText(importContents.text);
                         if (error != '')
-                            importContents.text = 'Error '
+                            importContents.text = error
                         else {
                             importContents.text = 'OK'
-                            text = 'Inserides!'
+                            text = qsTr('Inserides!')
                         }
                     }
                 }
             }
 
         }
-
     }
 
     Button {
-        id: backbutton
-        text: 'Torna'
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
+        text: qsTr('Torna')
+        height: units.fingerUnit
+        Layout.fillWidth: true
         onClicked: backup.closeBackup()
     }
 }

@@ -1,51 +1,63 @@
 import QtQuick 2.0
+import QtQuick.Layouts 1.1
+import QtQuick.Controls 1.1
 import "Storage.js" as Storage
+import 'core' as Core
 
-Rectangle {
+
+ColumnLayout {
     id: receiptsWidget
+    anchors.fill: parent
+
     signal newReceipt (string name)
     signal showReceipt (int id)
     signal backup
 
-    SearchBox {
-        id: searchBox
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.margins: 10
-        onPerformSearch: Storage.listReceiptsWithFilter(receiptsModel,textSearch)
+    Core.BasicWidget {
+        id: units
     }
 
-    Image {
-        id: mainImage
-        source: 'res/cooking-pot-159470_1280.png'
-        width: parent.height / 2
-        height: parent.height / 2
-        fillMode: Image.PreserveAspectFit
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.margins: parent.height / 8
-    }
+    Rectangle {
+        height: units.fingerUnit
+        Layout.fillWidth: true
 
-    ListModel {
-        id: receiptsModel
+        RowLayout {
+            anchors.fill: parent
+            Button {
+                Layout.fillHeight: true
+                anchors.margins: units.nailUnit
+                text: qsTr('Nova')
+                onClicked: receiptsWidget.newReceipt(searchBox.text)
+            }
+
+            Core.SearchBox {
+                id: searchBox
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                anchors.margins: units.nailUnit
+                onPerformSearch: Storage.listReceiptsWithFilter(receiptsModel,text)
+            }
+            Button {
+                text: qsTr('Edita')
+                Layout.fillHeight: true
+            }
+        }
+        Component.onCompleted: console.log('Rectangle height ' + height + '-' + units.fingerUnit)
     }
 
     ListView {
         id: receiptsList
         clip: true
 
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: searchBox.bottom
-        anchors.bottom: backupArea.top
-        anchors.margins: 10
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        anchors.margins: units.nailUnit
 
-        model: receiptsModel
+        model: ListModel { id: receiptsModel }
+
         delegate: Rectangle {
             width: parent.width
-            height: rowReceipt.height
+            height: units.fingerUnit * 2
             clip: true
 
             Rectangle {
@@ -60,7 +72,7 @@ Rectangle {
 
             Row {
                 id: rowReceipt
-                anchors.margins: 10
+                anchors.margins: units.nailUnit
                 height: childrenRect.height + 10
                 z: 2
                 // height: 100
@@ -96,14 +108,23 @@ Rectangle {
                 }
             }
         }
+        Image {
+            id: mainImage
+            source: 'res/cooking-pot-159470_1280.png'
+            width: parent.height / 2
+            height: parent.height / 2
+            fillMode: Image.PreserveAspectFit
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.margins: parent.height / 8
+        }
     }
 
     Rectangle {
         id: backupArea
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        height: 50
+        Layout.fillWidth:true
+        height: units.fingerUnit
 
         Text {
             text: 'Backup'

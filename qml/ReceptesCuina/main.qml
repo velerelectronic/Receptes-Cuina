@@ -1,4 +1,6 @@
 import QtQuick 2.0
+import QtQuick.Layouts 1.1
+import 'core' as Core
 import "Storage.js" as Storage
 
 Rectangle {
@@ -14,47 +16,65 @@ Rectangle {
     signal backup
     signal closeBackup
 
-    Text {
-        id: title
-        text: "Receptes de cuina"
-        anchors.top: parent.top
-        anchors.horizontalCenter: parent.horizontalCenter
-
-        color: "#000000"
-        font.italic: false
-        font.bold: true
-        font.pointSize: 32
-        verticalAlignment: Text.AlignVCenter
-        font.family: "Tahoma"
+    Core.BasicWidget {
+        id: units
     }
 
-    Loader {
-        id: pageLoader
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: title.bottom
-        anchors.bottom: parent.bottom
+    RowLayout {
+        anchors.fill: parent
+        Text {
+            id: title
+            text: "Receptes de cuina"
+            anchors.top: parent.top
+            anchors.horizontalCenter: parent.horizontalCenter
 
-        Connections {
-            target: pageLoader.item
-            ignoreUnknownSignals: true
-            onNewReceipt: pageLoader.setSource('NewReceipt.qml', {receiptName: name})
-            onNoNewReceipt: openMainPage()
-            onSavedReceipt: pageLoader.setSource('ShowReceipt.qml', {receiptId: receiptId})
-            onShowReceipt: pageLoader.setSource('ShowReceipt.qml', {receiptId: id})
-            onCloseReceipt: openMainPage()
-            onBackup: pageLoader.setSource('Backup.qml')
-            onCloseBackup: openMainPage()
+            color: "#000000"
+            font.italic: false
+            font.bold: true
+            font.pixelSize: units.fingerUnit
+            verticalAlignment: Text.AlignVCenter
+            font.family: "Tahoma"
         }
+
+        Loader {
+            id: pageLoader
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: title.bottom
+            anchors.bottom: parent.bottom
+
+            Connections {
+                target: pageLoader.item
+                ignoreUnknownSignals: true
+                onNewReceipt: openSubPage('NewReceipt.qml', {receiptName: name})
+                onNoNewReceipt: openMainPage()
+                onSavedReceipt: openSubPage('ShowReceipt.qml', {receiptId: receiptId})
+                onShowReceipt: openSubPage('ShowReceipt.qml', {receiptId: id})
+                onCloseReceipt: openMainPage()
+                onBackup: openSubPage('Backup.qml',{})
+                onCloseBackup: openMainPage()
+            }
+        }
+
+    }
+    function openSubPage(page,param) {
+        pageLoader.setSource(page,param);
     }
 
     function openMainPage() {
-        pageLoader.setSource('ReceiptsList.qml');
+        openSubPage('ReceiptsList.qml',{});
     }
 
     Component.onCompleted: {
         Storage.initDatabase();
-        openMainPage();
+        mainApp.openMainPage();
     }
 
+    focus: true
+    Keys.onReleased: {
+        if (event.key == Qt.Key_Back) {
+            event.accepted = true;
+            mainApp.openMainPage();
+        }
+    }
 }
