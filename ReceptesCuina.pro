@@ -1,28 +1,22 @@
-QT += sql
+TEMPLATE = app
 
-# Add more folders to ship with the application, here
-folder_01.source = qml/ReceptesCuina
-folder_01.target = qml
-DEPLOYMENTFOLDERS = folder_01
+QT += qml quick sql
 
-# Additional import path used to resolve QML modules in Creator's code model
+SOURCES += main.cpp \
+    sqltablemodel.cpp
+
+RESOURCES += qml.qrc \
+    core.qrc \
+    images.qrc
+
+# Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
 
-# The .cpp file which was generated for your project. Feel free to hack it.
-SOURCES += main.cpp
+# Default rules for deployment.
+include(deployment.pri)
 
-# Installation path
-# target.path =
-
-# Please do not modify the following two lines. Required for deployment.
-include(qtquick2applicationviewer/qtquick2applicationviewer.pri)
-qtcAddDeployment()
+HEADERS += \
+    sqltablemodel.h
 
 OTHER_FILES += \
-    qml/ReceptesCuina/ReceiptsList.qml \
-    qml/ReceptesCuina/Storage.js \
-    qml/ReceptesCuina/ReceiptElement.qml \
     android/AndroidManifest.xml
-
-ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
-

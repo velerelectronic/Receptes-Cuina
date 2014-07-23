@@ -1,8 +1,7 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.0
 import QtQuick.Layouts 1.1
-import 'core' as Core
-import "Storage.js" as Storage
+import 'qrc:///core' as Core
 
 
 Rectangle {
@@ -10,18 +9,23 @@ Rectangle {
     property string receiptId: ''
     signal closeReceipt
 
+    property bool editMode: editButton.checked
+
     anchors.fill: parent
 
-    Core.BasicWidget { id: units }
+    Core.UseUnits { id: units }
 
     ColumnLayout {
         anchors.fill: parent
+
         Rectangle {
             anchors.margins: units.nailUnit
             Layout.fillWidth: true
             Layout.preferredHeight: units.fingerUnit
+
             RowLayout {
                 anchors.fill: parent
+                spacing: units.nailUnit
                 Button {
                     id: editButton
                     Layout.fillHeight: true
@@ -29,11 +33,6 @@ Rectangle {
                     text: qsTr('Edita')
                     checkable: true
                     checked: false
-                    onClicked: {
-                        deleteButton.visible = checked
-                        ingr.visibleNewButton = checked
-                        elab.visibleNewButton = checked
-                    }
                 }
 
                 Button {
@@ -49,12 +48,31 @@ Rectangle {
 
                 Button {
                     id: deleteButton
-                    visible: false
+                    visible: editMode
                     Layout.fillHeight: true
                     anchors.margins: units.nailUnit
                     text: qsTr('Elimina')
                 }
             }
+        }
+
+        ListView {
+            Layout.fillWidth: true
+            Layout.preferredHeight: units.fingerUnit * 5
+            model: imagesModel
+            delegate: Image {
+                source: model.image
+                height: units.fingerUnit * 5
+                width: units.fingerUnit * 5
+            }
+            Component.onCompleted: imagesModel.setReference('receipt',receiptId);
+        }
+        Button {
+            text: qsTr('Nova imatge')
+            visible: editMode
+            Layout.fillWidth: true
+            Layout.preferredHeight: (visible)?units.fingerUnit:0
+            onClicked: {}
         }
 
         Flickable {
@@ -97,7 +115,7 @@ Rectangle {
                             anchors.top: parent.top
                             anchors.margins: units.nailUnit
                             wrapMode: Text.WordWrap
-                            font.pixelSize: units.fingerUnit
+                            font.pixelSize: units.readUnit
                             font.bold: true
                         }
 
@@ -112,7 +130,7 @@ Rectangle {
                             font.pixelSize: units.nailUnit * 2
                         }
                         Component.onCompleted: {
-                            var dades = Storage.getReceiptNameAndDesc(receiptId);
+                            var dades = receiptsModel.getObject(receiptId);
                             receiptName.text = dades.name;
                             receiptDesc.text = dades.desc;
                         }
@@ -122,36 +140,60 @@ Rectangle {
                         id: ingr
                         caption: qsTr('Ingredients')
                         newelement: qsTr('Afegeix un altre ingredient')
-                        model: ListModel { id: ingredientsModel }
+                        model: ingredientsModel
+                        visibleNewButton: editMode
                         delegate: ReceiptElement {
                             elementId: model.id
                             elementOrd: model.ord
                             elementDesc: model.desc
-                            elementType: model.type
-                            elementIndex: index
-                            onRemoveElementRequested: Storage.removeIngredient(elementId,showReceipt.receiptId,ingredientsModel,elementIndex)
-                            onSaveElementRequested: Storage.saveNewIngredient(elementId,desc,showReceipt.receiptId,ingredientsModel,elementIndex)
+                            elementIndex: model.index
+                            onRemoveElementRequested: {
+                                ingredientsModel.removeObjectWithKeyValue(elementId);
+                                ingredientsModel.select();
+                            }
+                            onSaveElementRequested: {
+                                console.log('Desaaaa');
+                                ingredientsModel.updateObject({id: elementId, desc: desc, receipt: showReceipt.receiptId, ord: elementIndex + 1});
+                            }
                         }
-                        onNewElementRequested: Storage.saveNewIngredient(-1,'',showReceipt.receiptId,ingredientsModel,-1)
-                        Component.onCompleted: Storage.listIngredientsFromReceipt(receiptId,ingredientsModel)
+                        onNewElementRequested: {
+                            ingredientsModel.insertObject({desc: '', receipt: showReceipt.receiptId, ord: ingredientsModel.count+1});
+                            ingredientsModel.select();
+                        }
+                        Component.onCompleted: {
+                            ingredientsModel.setReference('receipt',receiptId);
+                            ingredientsModel.select();
+                        }
                     }
 
                     CommonList {
                         id: elab
                         caption: qsTr('Elaboració')
                         newelement: qsTr('Afegeix una altra passa')
-                        model: ListModel { id: stepsModel }
+                        model: stepsModel
+                        visibleNewButton: editMode
                         delegate: ReceiptElement {
                             elementId: model.id
                             elementOrd: model.ord
                             elementDesc: model.desc
-                            elementType: model.type
-                            elementIndex: index
-                            onRemoveElementRequested: Storage.removeStep(elementId,showReceipt.receiptId,stepsModel,elementIndex)
-                            onSaveElementRequested: Storage.saveNewStep(elementId,desc,showReceipt.receiptId,stepsModel,elementIndex)
+                            elementIndex: model.index
+                            onRemoveElementRequested: {
+                                stepsModel.removeObjectWithKeyValue(elementId);
+                                stepsModel.select();
+                            }
+                            onSaveElementRequested: {
+                                console.log('Desaaaa');
+                                stepsModel.updateObject({id: elementId, desc: desc, receipt: showReceipt.receiptId, ord: elementIndex + 1});
+                            }
                         }
-                        onNewElementRequested: Storage.saveNewStep(-1,'',showReceipt.receiptId,stepsModel,-1)
-                        Component.onCompleted: Storage.listStepsFromReceipt(receiptId,stepsModel)
+                        onNewElementRequested: {
+                            stepsModel.insertObject({desc: '', receipt: showReceipt.receiptId, ord: stepsModel.count+1});
+                            stepsModel.select();
+                        }
+                        Component.onCompleted: {
+                            stepsModel.setReference('receipt',receiptId);
+                            stepsModel.select();
+                        }
                     }
 
                 }

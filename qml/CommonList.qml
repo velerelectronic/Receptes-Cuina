@@ -1,57 +1,55 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.1
-import 'core' as Core
+import QtQuick.Layouts 1.1
+import 'qrc:///core' as Core
 
 Rectangle {
     property alias caption: label.text
     property alias model: list.model
     property alias delegate: list.delegate
     property alias newelement: newElementButton.text
-    property alias visibleNewButton: newElementButton.visible
+    property bool visibleNewButton: false
 
     signal newElementRequested
 
     anchors.left: parent.left
     anchors.right: parent.right
-    height: childrenRect.height
+    anchors.margins: units.nailUnit
+    height: mainLayout.height
 
-    Core.BasicWidget {
+    Core.UseUnits {
         id: units
     }
 
-    Column {
+    ColumnLayout {
+        id: mainLayout
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        height: childrenRect.height
+        height: label.height + list.height + newElementButton.height
 
         Text {
             id: label
             text: ''
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.margins: units.nailUnit
+            Layout.fillWidth: true
+            Layout.preferredHeight: contentHeight
             font.bold: true
-            font.pixelSize: units.fingerUnit
+            font.pixelSize: units.readUnit
         }
 
         ListView {
             id: list
-            anchors.left: parent.left
-            anchors.right: parent.right
-            height: childrenRect.height
+            Layout.fillWidth: true
+            Layout.preferredHeight: childrenRect.height
             interactive: false
-/*            header: Component {
-                Text { text: 'header' }
-            }*/
         }
 
         Button {
             id: newElementButton
-            anchors.left: parent.left
-            anchors.right: parent.right
-            height: units.fingerUnit
-            visible: false
+            Layout.fillWidth: true
+            Layout.preferredHeight: height
+            height: (visibleNewButton)?units.fingerUnit:0
+            visible: visibleNewButton
             onClicked: newElementRequested()
         }
     }

@@ -1,7 +1,10 @@
-#include <QtGui/QGuiApplication>
-#include "qtquick2applicationviewer.h"
-#include <QQmlEngine>
+#include <QGuiApplication>
+#include <QQmlApplicationEngine>
+#include <QSqlDatabase>
 #include <QDebug>
+#include <QQmlContext>
+
+#include "sqltablemodel.h"
 
 int main(int argc, char *argv[])
 {
@@ -10,14 +13,27 @@ int main(int argc, char *argv[])
     app.setOrganizationName("joanmiquelpayerascrespi");
     app.setApplicationVersion("1.0");
 
-    QtQuick2ApplicationViewer viewer;
+    QQmlApplicationEngine engine;
 
-    viewer.setMainQmlFile(QStringLiteral("qml/ReceptesCuina/main.qml"));
+    qDebug() << QString("----->")  << app.applicationVersion();
 
-    QString str = (viewer.engine())->offlineStoragePath();
-    qDebug() << QString("----->") << str << app.applicationVersion();
+    QSqlDatabase db;
+    db = QSqlDatabase::addDatabase("QSQLITE");
 
-    viewer.showExpanded();
+    qDebug() << engine.offlineStoragePath();
+    db.setDatabaseName(engine.offlineStoragePath() + "/Databases/982e3d0179df85ab6e1c5d705ad596ea.sqlite");
+
+    SqlTableModel receiptsModel;
+    SqlTableModel ingredientsModel;
+    SqlTableModel stepsModel;
+    SqlTableModel imagesModel;
+
+    engine.rootContext()->setContextProperty("receiptsModel",&receiptsModel);
+    engine.rootContext()->setContextProperty("ingredientsModel",&ingredientsModel);
+    engine.rootContext()->setContextProperty("stepsModel",&stepsModel);
+    engine.rootContext()->setContextProperty("imagesModel",&imagesModel);
+
+    engine.load(QUrl(QStringLiteral("qrc:///qml/main.qml")));
 
     return app.exec();
 }

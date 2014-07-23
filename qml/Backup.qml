@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.0
 import QtQuick.Layouts 1.1
-import 'core' as Core
+import 'qrc:///core' as Core
 import "Storage.js" as Storage
 
 ColumnLayout {
@@ -11,7 +11,7 @@ ColumnLayout {
 
     signal closeBackup
 
-    Core.BasicWidget {
+    Core.UseUnits {
         id: units
     }
 
