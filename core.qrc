@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>core/EditBox.qml</file>
+        <file>core/SearchBox.qml</file>
+        <file>core/UseUnits.qml</file>
+    </qresource>
+</RCC>
