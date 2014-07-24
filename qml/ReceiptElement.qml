@@ -20,7 +20,7 @@ Rectangle {
     signal removeElementRequested(int elementId,int index)
 
     width: parent.width
-    height: mainLayout.height
+    height: mainLayout.height + 2 * mainLayout.anchors.margins
 
     Core.UseUnits { id: units }
 
@@ -35,8 +35,8 @@ Rectangle {
 
         Text {
             id: ord
-            Layout.preferredHeight: contentHeight
             Layout.preferredWidth: units.fingerUnit
+            Layout.preferredHeight: contentHeight
             verticalAlignment: Text.AlignTop
             font.pixelSize: units.readUnit
             font.bold: true

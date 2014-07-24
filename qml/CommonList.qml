@@ -26,7 +26,8 @@ Rectangle {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        height: label.height + list.height + newElementButton.height
+        height: label.height + list.height + newElementButton.height + 2 * units.nailUnit
+        spacing: units.nailUnit
 
         Text {
             id: label
@@ -40,7 +41,7 @@ Rectangle {
         ListView {
             id: list
             Layout.fillWidth: true
-            Layout.preferredHeight: childrenRect.height
+            Layout.preferredHeight: contentItem.height
             interactive: false
         }
 

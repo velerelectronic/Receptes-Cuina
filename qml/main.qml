@@ -2,10 +2,12 @@ import QtQuick 2.2
 import QtQuick.Layouts 1.1
 import QtQuick.Window 2.0
 import 'qrc:///core' as Core
-import "qrc:///qml/Storage.js" as Storage
 
 Window {
     id: mainApp
+
+    width: Screen.width
+    height: Screen.height
 // No dimensions. The rectangle must be full screen
 //    anchors.fill: parent
 
@@ -52,7 +54,11 @@ Window {
             ignoreUnknownSignals: true
             onNewReceipt: openSubPage('NewReceipt', {receiptName: name})
             onNoNewReceipt: openMainPage()
-            onSavedReceipt: openSubPage('ShowReceipt', {receiptId: receiptId})
+            onSaveReceiptRequested: {
+                receiptsModel.insertObject({name: name, desc: desc});
+                openMainPage();
+            }
+            onNoReceipt: openMainPage()
             onShowReceipt: openSubPage('ShowReceipt', {receiptId: id})
             onCloseReceipt: openMainPage()
             onBackup: openSubPage('Backup',{})
@@ -69,21 +75,32 @@ Window {
     }
 
     Component.onCompleted: {
-        receiptsModel.setQuery('CREATE TABLE IF NOT EXISTS receipts (id INTEGER PRIMARY KEY, name TEXT, desc TEXT, image TEXT)');
+        /*
+        receiptsModel.setQuery('DROP TABLE receipts');
+        ingredientsModel.setQuery('DROP TABLE ingredientsReceipts');
+        stepsModel.setQuery('DROP TABLE stepsReceipts');
+        imagesModel.setQuery('DROP TABLE imagesReceipts');
+        */
+
+        receiptsModel.setQuery('CREATE TABLE IF NOT EXISTS receipts (id INTEGER PRIMARY KEY, name TEXT, desc TEXT, image BLOB)');
         receiptsModel.tableName = 'receipts';
         receiptsModel.fieldNames = ['id', 'name', 'desc', 'image'];
+        receiptsModel.setSort(1,Qt.AscendingOrder);
 
         ingredientsModel.setQuery('CREATE TABLE IF NOT EXISTS ingredientsReceipts (id INTEGER PRIMARY KEY,receipt INTEGER,ord INTEGER,desc TEXT)')
         ingredientsModel.tableName = 'ingredientsReceipts';
         ingredientsModel.fieldNames = ['id', 'receipt','ord','desc'];
+        ingredientsModel.setSort(2,Qt.AscendingOrder);
 
         stepsModel.setQuery('CREATE TABLE IF NOT EXISTS stepsReceipts (id INTEGER PRIMARY KEY,receipt INTEGER,ord INTEGER,desc TEXT)');
         stepsModel.tableName = 'stepsReceipts';
         stepsModel.fieldNames = ['id','receipt','ord','desc'];
+        stepsModel.setSort(2,Qt.AscendingOrder);
 
-        imagesModel.setQuery('CREATE TABLE IF NOT EXISTS imagesReceipts (id INTEGER PRIMARY KEY,receipt INTEGER,ord INTEGER,image TEXT)');
+        imagesModel.setQuery('CREATE TABLE IF NOT EXISTS imagesReceipts (id INTEGER PRIMARY KEY,receipt INTEGER,ord INTEGER,image BLOB)');
         imagesModel.tableName = 'imagesReceipts';
         imagesModel.fieldNames = ['id','receipt','ord','image'];
+        imagesModel.setSort(2,Qt.AscendingOrder);
 
         mainApp.openMainPage();
     }

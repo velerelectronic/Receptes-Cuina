@@ -1,7 +1,6 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.0
 import QtQuick.Layouts 1.1
-import "Storage.js" as Storage
 import 'qrc:///core' as Core
 
 Rectangle {
@@ -9,7 +8,7 @@ Rectangle {
     anchors.fill: parent
 
     property alias receiptName: receiptName.text
-    signal savedReceipt(int receiptId)
+    signal saveReceiptRequested(string name, string desc)
     signal noNewReceipt()
 
     Core.UseUnits { id: units }
@@ -69,7 +68,7 @@ Rectangle {
             Button {
                 Layout.preferredHeight: units.fingerUnit
                 text: qsTr('Desa')
-                onClicked: newReceipt.savedReceipt(Storage.saveNewReceipt(receiptName.text,receiptDesc.text))
+                onClicked: saveReceiptRequested(receiptName.text,receiptDesc.text)
             }
             Button {
                 Layout.preferredHeight: units.fingerUnit

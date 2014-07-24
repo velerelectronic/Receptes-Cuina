@@ -1,12 +1,13 @@
 <RCC>
     <qresource prefix="/">
         <file>qml/main.qml</file>
-        <file>qml/Storage.js</file>
         <file>qml/Backup.qml</file>
         <file>qml/CommonList.qml</file>
         <file>qml/NewReceipt.qml</file>
         <file>qml/ReceiptElement.qml</file>
         <file>qml/ReceiptsList.qml</file>
         <file>qml/ShowReceipt.qml</file>
+        <file>qml/ImageCamera.qml</file>
+        <file>qml/ImageGallery.qml</file>
     </qresource>
 </RCC>

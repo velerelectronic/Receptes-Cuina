@@ -1,9 +1,15 @@
 TEMPLATE = app
 
-QT += qml quick sql
+QT += \
+    qml \
+    quick \
+    sql \
+    multimedia
 
 SOURCES += main.cpp \
-    sqltablemodel.cpp
+    sqltablemodel.cpp \
+    imagedata.cpp \
+    databasebackup.cpp
 
 RESOURCES += qml.qrc \
     core.qrc \
@@ -16,7 +22,9 @@ QML_IMPORT_PATH =
 include(deployment.pri)
 
 HEADERS += \
-    sqltablemodel.h
+    sqltablemodel.h \
+    imagedata.h \
+    databasebackup.h
 
 OTHER_FILES += \
     android/AndroidManifest.xml

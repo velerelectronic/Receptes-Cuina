@@ -11,6 +11,7 @@
 SqlTableModel::SqlTableModel(QObject *parent, QSqlDatabase db) :
     QSqlRelationalTableModel(parent,db)
 {
+    setEditStrategy(QSqlTableModel::OnFieldChange);
     connect(this,SIGNAL(rowsInserted(QModelIndex,int,int)),this,SLOT(select()));
 }
 
@@ -68,13 +69,14 @@ void SqlTableModel::setTableName(const QString &tableName) {
     generateRoleNames();
     tableNameChanged();
 
-    setEditStrategy(QSqlTableModel::OnFieldChange);
-    setSort(1,Qt::DescendingOrder);
+    setSort(0,Qt::DescendingOrder);
     setFilter("");
 }
 
 bool SqlTableModel::setQuery(const QString query) {
+    qDebug() << "Query... " << query;
     QSqlRelationalTableModel::setQuery(QSqlQuery(query));
+    submitAll();
 }
 
 QVariant SqlTableModel::data(const QModelIndex &index, int role) const {
@@ -133,7 +135,6 @@ QVariantMap SqlTableModel::getObject(QString key) const {
     int row=0;
     while ((!found) && (row<rowCount())) {
         searchRecord = this->record(row);
-        qDebug() << primaryKey().fieldName(0);
         if (searchRecord.value(primaryKey().fieldName(0))==key)
             found = true;
         else
@@ -202,7 +203,6 @@ bool SqlTableModel::updateObject(const QVariantMap &object) {
     bool result = false;
     if (row>-1) {
         QSqlRecord record = buildRecord(object,false);
-        qDebug() << record;
         result = updateRowInTable(row,record);
         selectRow(row);
         select();

@@ -3,8 +3,13 @@
 #include <QSqlDatabase>
 #include <QDebug>
 #include <QQmlContext>
+#include <QtQml>
+#include <QDir>
+#include <QStandardPaths>
 
 #include "sqltablemodel.h"
+#include "imagedata.h"
+#include "databasebackup.h"
 
 int main(int argc, char *argv[])
 {
@@ -15,18 +20,25 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
 
-    qDebug() << QString("----->")  << app.applicationVersion();
+    QString specificPath("ReceptesCuina");
+    QDir dir(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation));
+    if (!dir.exists(specificPath)) {
+        dir.mkdir(specificPath);
+    }
 
     QSqlDatabase db;
-    db = QSqlDatabase::addDatabase("QSQLITE");
-
-    qDebug() << engine.offlineStoragePath();
-    db.setDatabaseName(engine.offlineStoragePath() + "/Databases/982e3d0179df85ab6e1c5d705ad596ea.sqlite");
+    if (dir.cd(specificPath)) {
+        db = QSqlDatabase::addDatabase("QSQLITE");
+        db.setDatabaseName(dir.absolutePath() + "/mainDatabase.sqlite");
+    }
 
     SqlTableModel receiptsModel;
     SqlTableModel ingredientsModel;
     SqlTableModel stepsModel;
     SqlTableModel imagesModel;
+
+    qmlRegisterType<ImageData>("PersonalTypes", 1, 0, "ImageData");
+    qmlRegisterType<DatabaseBackup>("PersonalTypes", 1, 0, "DatabaseBackup");
 
     engine.rootContext()->setContextProperty("receiptsModel",&receiptsModel);
     engine.rootContext()->setContextProperty("ingredientsModel",&ingredientsModel);

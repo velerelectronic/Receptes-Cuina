@@ -2,8 +2,6 @@ import QtQuick 2.2
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 1.1
 import QtGraphicalEffects 1.0
-
-import "Storage.js" as Storage
 import 'qrc:///core' as Core
 
 Rectangle {
@@ -47,7 +45,7 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 anchors.margins: units.nailUnit
-                onPerformSearch: Storage.listReceiptsWithFilter(receiptsModel,text)
+                onPerformSearch: receiptsModel.filterFields(['name','desc'],searchBox.text)
             }
 
             Button {
@@ -192,7 +190,6 @@ Rectangle {
 
     Component.onCompleted: {
         receiptsModel.select();
-        // Storage.listReceipts(receiptsModel)
     }
 }
 

@@ -56,23 +56,16 @@ Rectangle {
             }
         }
 
-        ListView {
+        ImageGallery {
             Layout.fillWidth: true
-            Layout.preferredHeight: units.fingerUnit * 5
+            Layout.preferredHeight: Math.round(parent.height/2)
             model: imagesModel
-            delegate: Image {
-                source: model.image
-                height: units.fingerUnit * 5
-                width: units.fingerUnit * 5
+            editMode: showReceipt.editMode
+            onGetNewPhoto: photoCamera.takePhoto()
+            Component.onCompleted: {
+                imagesModel.setReference('receipt',receiptId);
+                imagesModel.select();
             }
-            Component.onCompleted: imagesModel.setReference('receipt',receiptId);
-        }
-        Button {
-            text: qsTr('Nova imatge')
-            visible: editMode
-            Layout.fillWidth: true
-            Layout.preferredHeight: (visible)?units.fingerUnit:0
-            onClicked: {}
         }
 
         Flickable {
@@ -81,14 +74,14 @@ Rectangle {
             Layout.fillHeight: true
             anchors.margins: units.nailUnit
             contentWidth: width
-            contentHeight: contentItem.childrenRect.height
+            contentHeight: receiptItems.height
             interactive: true
             clip: true
 
             Rectangle {
+                id: receiptItems
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.top: parent.top
                 height: childrenRect.height
 
                 Column {
@@ -96,6 +89,7 @@ Rectangle {
                     anchors.left: parent.left
                     anchors.right: parent.right
                     height: childrenRect.height + units.nailUnit * 2
+                    spacing: units.nailUnit
 
                     Rectangle {
                         id: dadesGenerals
@@ -117,6 +111,7 @@ Rectangle {
                             wrapMode: Text.WordWrap
                             font.pixelSize: units.readUnit
                             font.bold: true
+                            height: contentHeight
                         }
 
                         // Print the contents
@@ -127,7 +122,8 @@ Rectangle {
                             anchors.right: parent.right
                             anchors.margins: units.nailUnit
                             wrapMode: Text.WordWrap
-                            font.pixelSize: units.nailUnit * 2
+                            font.pixelSize: units.readUnit
+                            height: contentHeight
                         }
                         Component.onCompleted: {
                             var dades = receiptsModel.getObject(receiptId);
@@ -164,6 +160,7 @@ Rectangle {
                             ingredientsModel.setReference('receipt',receiptId);
                             ingredientsModel.select();
                         }
+                        onHeightChanged: console.log(height)
                     }
 
                     CommonList {
@@ -198,6 +195,30 @@ Rectangle {
 
                 }
             }
+        }
+    }
+
+    Loader {
+        id: photoCamera
+        anchors.fill: parent
+
+        Connections {
+            target: photoCamera.item
+            ignoreUnknownSignals: true
+            onSaveImage: {
+                imagesModel.insertObject({receipt: receiptId, image: contents})
+                photoCamera.closeCamera()
+            }
+            onCancelImage: photoCamera.closeCamera()
+        }
+
+        function takePhoto() {
+            photoCamera.visible = true;
+            photoCamera.source = 'qrc:///qml/ImageCamera.qml';
+        }
+
+        function closeCamera() {
+            photoCamera.sourceComponent = undefined;
         }
     }
 }
