@@ -1,5 +1,15 @@
 TODO
 ====
+Revision 3
+----------
+24th July 2014
+* Edit title and description of existing receipts
+* Delete receipts
+* Reorder the ingredients and the steps of a receipt
+* Ask for confirmation when deleting an ingredient or a step
+* Include a collection of links where one can find more receipts (from 4th item in the last TODO)
+* Include relationships between images and ingredients and steps
+
 Revision 2
 ----------
 30th January 2014
