@@ -9,6 +9,7 @@ Revision 3
 * Ask for confirmation when deleting an ingredient or a step
 * Include a collection of links where one can find more receipts (from 4th item in the last TODO)
 * Include relationships between images and ingredients and steps
+* Assign a photo to every receipt as an identification
 
 Revision 2
 ----------
