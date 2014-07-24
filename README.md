@@ -14,6 +14,7 @@ Cada recepta està formada per:
 * Una llista de __passes d'elaboració__. Cada passa inclou:
   * Una descripció
   * Un número per ordenar-la dins la resta de passes
+* Un conjunt de fotografies
 
 Features
 --------
@@ -22,6 +23,7 @@ Features
 * Cercar per títol sense distingir majúscules i minúscules
 * Afegir ingredients a una recepta, esborrar-los i modificar-ne la descripció.
 * Afegir passes d'elaboració a una recepta, esborrar-les i modificar-ne la descripció.
+* Afegir fografies preses amb la càmera.
 
 Mancances
 ---------
@@ -29,6 +31,7 @@ Mancances
 * Tampoc no es poden esborrar.
 * No es poden reordenar la llista d'ingredients ni la llista de passes d'elaboració.
 * En el moment d'eliminar ingredients o passes, no es demana confirmació.
+* Les imatges només es refereixen a tota la recepta. Tampoc no hi ha una imatge identificativa de cada recepta.
 
 Pantalla principal
 ------------------
@@ -52,7 +55,8 @@ Opcions que es poden realitzar:
 
 Errors coneguts
 ---------------
-Les actualitzacions esborren la base de dades completament. Per tant, abans de procedir a actualitzar l'aplicació, convé fer-ne una còpia de seguretat a través de la pantalla Backup.
+Actualment cap.
+
 
 Imatges
 -------
