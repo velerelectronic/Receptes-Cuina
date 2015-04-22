@@ -16,18 +16,33 @@ Rectangle {
         id: units
     }
 
+    Text {
+        id: title
+        text: "Receptes de cuina"
+        anchors.top: parent.top
+        anchors.horizontalCenter: parent.horizontalCenter
+        height: contentHeight + 2 * units.nailUnit
+
+        color: "#000000"
+        font.italic: false
+        font.bold: true
+        font.pixelSize: units.readUnit
+        verticalAlignment: Text.AlignVCenter
+        font.family: "Tahoma"
+    }
+
     Item {
         id: buttons
-        anchors.top: parent.top
+        anchors.top: title.bottom
         height: units.fingerUnit
         anchors.left: parent.left
         anchors.right: parent.right
 
         RowLayout {
             anchors.fill: parent
+            spacing: units.nailUnit
             Button {
                 Layout.fillHeight: true
-                anchors.margins: units.nailUnit
                 text: qsTr('Nova')
                 onClicked: receiptsWidget.newReceipt(searchBox.text)
             }
@@ -44,7 +59,6 @@ Rectangle {
                 id: searchBox
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                anchors.margins: units.nailUnit
                 onPerformSearch: receiptsModel.filterFields(['name','desc'],searchBox.text)
             }
 
@@ -111,7 +125,7 @@ Rectangle {
         anchors.margins: parent.height / 8
     }
 
-    ListView {
+    GridView {
         id: receiptsList
         clip: true
 
@@ -125,39 +139,52 @@ Rectangle {
 
         model: receiptsModel
 
+        cellHeight: width / 4
+        cellWidth: width / 3
+
         delegate: Item {
-            width: parent.width
-            height: Math.min(units.fingerUnit * 2, itemRect.height) + 2 * units.nailUnit
+            width: receiptsList.cellWidth
+            height: receiptsList.cellHeight
+//            width: parent.width
+//            height: Math.min(units.fingerUnit * 2, itemRect.height) + 2 * units.nailUnit
             z: 5
 //                opacity: 0.5
 
             Rectangle {
-                anchors.fill: itemRect
-                color: 'white'
-                opacity: 0.5
-            }
-
-            Rectangle {
                 id: itemRect
                 border.color: 'black'
-                color: 'transparent'
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.left: parent.left
-                anchors.right: parent.right
+                color: 'white'
+                anchors.fill: parent
                 anchors.margins: units.nailUnit
-                height: receiptColumn.height + units.nailUnit * 2
                 z: 5
 
+                Image {
+                    anchors.fill: parent
+                    source: (model.image)?model.image:''
+                }
+
+                Rectangle {
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    anchors.margins: 1
+                    height: receiptColumn.height + 2 * units.nailUnit
+
+                    color: 'white'
+                    opacity: 0.7
+                }
                 ColumnLayout {
                     id: receiptColumn
-                    height: nameReceipt.height + descReceipt.height + units.nailUnit
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    height: nameReceipt.height + descReceipt.height + spacing
                     anchors.margins: units.nailUnit
                     spacing: units.nailUnit
 
                     Text {
                         id: nameReceipt
-                        Layout.preferredHeight: height
-                        height: contentHeight
+                        Layout.preferredHeight: contentHeight
                         Layout.fillWidth: true
                         text: name
                         font.bold: true
@@ -166,18 +193,12 @@ Rectangle {
                     }
                     Text {
                         id: descReceipt
-                        Layout.preferredHeight: height
-                        height: contentHeight
+                        Layout.preferredHeight: contentHeight
                         Layout.fillWidth: true
                         text: desc.replace(/[\n\r]/g,' ') + ' '
                         font.pixelSize: units.readUnit
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     }
-                }
-
-                Image {
-                    anchors.fill: parent
-                    source: (model.image)?model.image:''
                 }
             }
 

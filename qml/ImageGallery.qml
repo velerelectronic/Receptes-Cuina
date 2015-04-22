@@ -6,6 +6,7 @@ Rectangle {
     property alias model: photoList.model
     property bool editMode: false
     signal getNewPhoto
+    signal processPhoto(int index,string photo)
 
     ListView {
         id: photoList
@@ -23,6 +24,10 @@ Rectangle {
                 anchors.fill: parent
                 anchors.margins: units.nailUnit
                 fillMode: Image.PreserveAspectFit
+                MouseArea {
+                    anchors.fill: parent
+                    onPressAndHold: processPhoto(model.index,model.image)
+                }
             }
         }
     }

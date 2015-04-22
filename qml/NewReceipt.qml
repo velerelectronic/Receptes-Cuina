@@ -5,7 +5,6 @@ import 'qrc:///core' as Core
 
 Rectangle {
     id: newReceipt
-    anchors.fill: parent
 
     property alias receiptName: receiptName.text
     signal saveReceiptRequested(string name, string desc)
@@ -13,8 +12,26 @@ Rectangle {
 
     Core.UseUnits { id: units }
 
+    MainBar {
+        id: mainBar
+        height: units.fingerUnit
+        anchors {
+            top: parent.top
+            left: parent.left
+            right: parent.right
+        }
+
+        onGoBack: noNewReceipt()
+    }
+
     ColumnLayout {
-        anchors.fill: parent
+        anchors {
+            top: mainBar.bottom
+            bottom: parent.bottom
+            left: parent.left
+            right: parent.right
+        }
+
         anchors.margins: units.nailUnit
         spacing: units.nailUnit
 

@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.0
 import QtQuick.Layouts 1.1
+import QtQuick.Dialogs 1.1
 import 'qrc:///core' as Core
 
 
@@ -11,12 +12,16 @@ Rectangle {
 
     property bool editMode: editButton.checked
 
-    anchors.fill: parent
-
     Core.UseUnits { id: units }
 
     ColumnLayout {
         anchors.fill: parent
+
+        MainBar {
+            Layout.preferredHeight: units.fingerUnit
+            Layout.fillWidth: true
+            onGoBack: closeReceipt()
+        }
 
         Rectangle {
             anchors.margins: units.nailUnit
@@ -33,13 +38,6 @@ Rectangle {
                     text: qsTr('Edita')
                     checkable: true
                     checked: false
-                }
-
-                Button {
-                    Layout.fillHeight: true
-                    anchors.margins: units.nailUnit
-                    text: qsTr('Torna')
-                    onClicked: showReceipt.closeReceipt()
                 }
 
                 Item {
@@ -62,6 +60,10 @@ Rectangle {
             model: imagesModel
             editMode: showReceipt.editMode
             onGetNewPhoto: photoCamera.takePhoto()
+            onProcessPhoto: {
+                setAsMainImage.photo = photo;
+                setAsMainImage.open();
+            }
             Component.onCompleted: {
                 imagesModel.setReference('receipt',receiptId);
                 imagesModel.select();
@@ -220,5 +222,16 @@ Rectangle {
         function closeCamera() {
             photoCamera.sourceComponent = undefined;
         }
+    }
+
+    MessageDialog {
+        id: setAsMainImage
+        property string photo: ''
+
+        title: qsTr('Fixar la imatge com a principal')
+        icon: StandardIcon.Question
+        informativeText: qsTr("Aquesta imatge es desarà com la principal d'aquesta recepta. Vols continuar?")
+        standardButtons: StandardButton.Ok | StandardButton.Cancel
+        onAccepted: receiptsModel.updateObject({id: receiptId, image: photo})
     }
 }

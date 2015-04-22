@@ -9,5 +9,6 @@
         <file>qml/ShowReceipt.qml</file>
         <file>qml/ImageCamera.qml</file>
         <file>qml/ImageGallery.qml</file>
+        <file>qml/MainBar.qml</file>
     </qresource>
 </RCC>

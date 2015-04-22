@@ -1,15 +1,15 @@
 import QtQuick 2.2
 import QtQuick.Layouts 1.1
 import QtQuick.Window 2.0
+import QtQuick.Controls 1.3
+
 import 'qrc:///core' as Core
 
 Window {
     id: mainApp
 
-    width: Screen.width
-    height: Screen.height
-// No dimensions. The rectangle must be full screen
-//    anchors.fill: parent
+    width: Screen.desktopAvailableWidth
+    height: Screen.desktopAvailableHeight
 
     signal newReceipt (string name)
     signal saveReceipt (string name, string desc)
@@ -23,55 +23,31 @@ Window {
         id: units
     }
 
-    Text {
-        id: title
-        text: "Receptes de cuina"
-        anchors.top: parent.top
-        anchors.horizontalCenter: parent.horizontalCenter
-        height: contentHeight + 2 * units.nailUnit
+    StackView {
+        id: pageStack
+        anchors.fill: parent
 
-        color: "#000000"
-        font.italic: false
-        font.bold: true
-        font.pixelSize: units.readUnit
-        verticalAlignment: Text.AlignVCenter
-        font.family: "Tahoma"
-        MouseArea {
-            anchors.fill: parent
-            onClicked: openMainPage()
-        }
-    }
-
-    Loader {
-        id: pageLoader
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: title.bottom
-        anchors.bottom: parent.bottom
+        initialItem: Qt.resolvedUrl('ReceiptsList.qml')
 
         Connections {
-            target: pageLoader.item
+            target: pageStack.currentItem
             ignoreUnknownSignals: true
             onNewReceipt: openSubPage('NewReceipt', {receiptName: name})
-            onNoNewReceipt: openMainPage()
+            onNoNewReceipt: pageStack.pop()
             onSaveReceiptRequested: {
                 receiptsModel.insertObject({name: name, desc: desc});
-                openMainPage();
+                pageStack.pop();
             }
-            onNoReceipt: openMainPage()
+            onNoReceipt: pageStack.pop()
             onShowReceipt: openSubPage('ShowReceipt', {receiptId: id})
-            onCloseReceipt: openMainPage()
+            onCloseReceipt: pageStack.pop()
             onBackup: openSubPage('Backup',{})
-            onCloseBackup: openMainPage()
+            onCloseBackup: pageStack.pop()
         }
     }
 
     function openSubPage(page,param) {
-        pageLoader.setSource('' + page + '.qml',param);
-    }
-
-    function openMainPage() {
-        openSubPage('ReceiptsList',{});
+        pageStack.push({item: Qt.resolvedUrl(page + '.qml'), properties: param});
     }
 
     Component.onCompleted: {
@@ -101,15 +77,13 @@ Window {
         imagesModel.tableName = 'imagesReceipts';
         imagesModel.fieldNames = ['id','receipt','ord','image'];
         imagesModel.setSort(2,Qt.AscendingOrder);
-
-        mainApp.openMainPage();
     }
 
 //    focus: true
     Keys.onReleased: {
         if (event.key == Qt.Key_Back) {
             event.accepted = true;
-            mainApp.openMainPage();
+            pageStack.pop()
         }
     }
 

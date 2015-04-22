@@ -18,8 +18,25 @@ Item {
         id: fileDb
     }
 
+    MainBar {
+        id: mainBar
+        height: units.fingerUnit
+        anchors {
+            top: parent.top
+            left: parent.left
+            right: parent.right
+        }
+
+        onGoBack: closeBackup()
+    }
+
     ColumnLayout {
-        anchors.fill: parent
+        anchors {
+            top: mainBar.bottom
+            bottom: parent.bottom
+            left: parent.left
+            right: parent.right
+        }
         anchors.margins: units.nailUnit * 2
 
         Text {
@@ -134,14 +151,6 @@ Item {
             }
 
         }
-
-        Button {
-            text: qsTr('Torna')
-            Layout.preferredHeight:  units.fingerUnit
-            Layout.fillWidth: true
-            onClicked: backup.closeBackup()
-        }
-
 
     }
     FolderListModel {
